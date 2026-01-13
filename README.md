@@ -7,6 +7,7 @@
 **第一版代码、重复性代码、语法补全、代码美化**等工作；
 所有生成代码均经过人工评审、修改与验证。
 
+
 致谢
 
 感谢sealdice/sealdice-core项目的所有开发者。
@@ -15,11 +16,13 @@
 感谢oissevalt/sealdice-plugins项目开发者，
 (https://github.com/oissevalt/sealdice-plugins/tree/main/src/triangle-agency)
 我带的第一个长团（三角机构）使用了你的插件，感恩🥹。
- 
+
+
 许可证
  
 本项目基于 MIT 许可证开源 - 详情请查看 LICENSE 文件。
- 
+
+
 贡献指南
 
 1. Star 本仓库，这对于一个业余开发者鼓励非常大。
