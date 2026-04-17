@@ -1,19 +1,30 @@
 // ==UserScript==
-// @name         TA-triangle-agency0.1.0
-// @author       小李Lxt
-// @version      0.1.1
-// @description  三角机构插件，.tahelp 打开帮助指令。特色是投掷后的QA结算功能，以及风味文字功能。过载使用.st存储在玩家属性中。
-// @timestamp    1704988800
+// @name         TriangleAgency0.1.3
+// @author       理水叠山333
+// @version      0.1.3
+// @timestamp    1769011200
 // @license      MIT
+// @description  三角机构插件，.tahelp 打开帮助指令。特色是投掷后的QA结算功能，以及风味文字功能。过载使用.st存储在玩家属性中。
+// @homepageURL  https://github.com/li-1084/plugins-for-sealdice
 // ==/UserScript==
 
+//0.1.3
+//1、尝试解决了.set ta后没有自动开启插件ext的BUG
+//2、修复了一些小BUG
+//
+//0.1.2
+//1、修复默认风味文字对不齐的问题，现在显示状态更加美观。
+//2、修复了QA面板逻辑不清晰的问题。
+//3、加入了.taflavor reset all指令。
+//4、加入了对旧译名的支持。
+//
 //0.1.1
 //1、更新大部分风味文字，修正逻辑错误的注释。
 //2、修复新投掷打断旧投掷时，旧投掷混沌值未结算的问题。
 //3、优化三重升华选项A的交互逻辑。
 
 
-/// <reference path="./seal.d.ts" />
+/// <reference path="../shared/seal.d.ts" />
 
 // 属性定义
 const ATTR_FOCUS = "专注";
@@ -41,16 +52,16 @@ const DEFAULT_FLAVOR: Record<string, string> = {
     // "roll_start": "> 正在接入机构OS... 特工 {$t玩家} (d4): [{1d4}]",
     
     // 角色卡 (.tas) 的头部和尾部模板
-    "card_header": "┏━━━━ TRIANGLE AGENCY ━━━━┓\n┃ 特工档案: {name}",
-    "card_footer": "┗━━━━━━━━━━━━━━━━━━━━━━━━━┛\n> 指令: .st [属性][数值] 改写数值",
+    "card_header": "┏TRIANGLE AGENCY┓\n┃ 特工档案: {name}",
+    "card_footer": "┗━━━━━━━━━━┛\n> 指令: .st [属性][数值] 改写数值",
     
     // 混沌值管理 (.tcs/.tcst) 的相关提示
     "chaos_show": "[ 混沌 ] 当前读数: {val}",
     "chaos_eliminate": "[ 混沌 ] 显化: {val} | 当前: {current}",
     "chaos_increase": "[ 混沌 ] 扭曲加剧! +{val} 混沌 | 当前: {current}",
-    "chaos_set": "[ 系统 ] 混沌指数重置: {val}",
-    "chaos_error_param": "[ 错误 ] 参数无效: {val}",
-    "chaos_error_val": "[ 错误 ] 数值无效: {val}",
+    "chaos_set": "[ 混沌 ] 指数重置: {val}",
+    "chaos_error_param": "[ 混沌 ] 参数无效: {val}",
+    "chaos_error_val": "[ 混沌 ] 数值无效: {val}",
     "chaos_missing_val": "> 请输入数值。范例: .tcst 5",
 
     // 新版投掷相关 (.ta/.tr) - 12种基础模版
@@ -59,41 +70,36 @@ const DEFAULT_FLAVOR: Record<string, string> = {
     "tr_normal_no_attr": ">>> 现实干涉 // 测试\n[ 序列 ] {rolls}\n[ 状态 ] 成功数: {cntTri} | 拟增加{cntChaos}混沌",
     
     // 模版B: 非属性-三重升华
-    "ta_trine_no_attr": ">>> 属性检定 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 警告: 能量指数异常！\n您的力量很强大... 祝您好运，特工。",
-    "tr_trine_no_attr": ">>> 现实干涉 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 警告: 现实边界波动！\n它在注视着你... 非常好运，不是吗？",
+    "ta_trine_no_attr": ">>> 属性检定 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 警告: 属性限制失效",
+    "tr_trine_no_attr": ">>> 现实干涉 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 警告: 现实边界波动",
 
     // 模版C: 属性-三重升华提示
-    "ta_trine_start": ">>> 属性: {attr} // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 力量... 更多的力量正在涌入！！！\n\n[ 分支协议 ]\n> A. 全员协力 (+任意3)\n> B. 稍后再议 (+3 QA)\n> C. 此刻之星 (+3 嘉奖)\n\n> 等待指令: .tatr a/b/c/quit",
-    "tr_trine_start": ">>> 协议: 现实改写 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 世界在您的意志下颤抖！！！\n\n[ 分支协议 ]\n> A. 全员协力 (+任意3)\n> B. 稍后再议 (+3 QA)\n> C. 此刻之星 (+3 嘉奖)\n\n> 等待指令: .tatr a/b/c/quit",
+    "ta_trine_start": ">>> 属性: {attr} // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 更多的力量正在涌入！\n\n[ 分支协议 ]\n> A. 全员协力 (+任意3)\n> B. 稍后再议 (+3 QA)\n> C. 此刻之星 (+3 嘉奖)\n\n> 等待指令: .tatr a/b/c/quit",
+    "tr_trine_start": ">>> 协议: 现实改写 // ▲ 三重升华 ▲\n[ 序列 ] {rolls}\n[ ! ] 世界在您的意志下颤抖！\n\n[ 分支协议 ]\n> A. 全员协力 (+任意3)\n> B. 稍后再议 (+3 QA)\n> C. 此刻之星 (+3 嘉奖)\n\n> 等待指令: .tatr a/b/c/quit",
 
     // 模版D: 属性-失败
-    "ta_fail": ">>> 属性: {attr} // 判定失败\n{details}\n{status}\n[ 阻滞 ] 现实拒绝了你的干涉。",
-    "tr_fail": ">>> 协议: 现实改写 // 失败\n{details}\n{status}\n[ 观测 ] 它冰冷而不可撼动，仿若一座黑色的方尖碑。",
+    "ta_fail": ">>> 属性: {attr} // 失败\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 你感到手脚乏力。 ]",
+    "tr_fail": ">>> 协议: 现实改写 // 失败\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 现实冰冷不可撼动。 ]",
 
     // 模版E: 属性-稳定成功
-    "ta_stable": ">>> 属性: {attr} // 稳定成功\n{details}\n{status}\n[ 稳定 ] 心如止水，无物可扰。",
-    "tr_stable": ">>> 协议: 现实改写 // 稳定成功\n{details}\n{status}\n[ 稳定 ] 此情此景反而更像是现实。",
+    "ta_stable": ">>> 属性: {attr} // 稳定成功\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 心如止水，无物可扰。 ]",
+    "tr_stable": ">>> 协议: 现实改写 // 稳定成功\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 此情此景反而更像是现实。 ]",
 
     // 模版F: 属性-成功
-    "ta_success": ">>> 属性: {attr} // 成功\n{details}\n{status}\n[ 确认 ] 恭喜你，特工。",
-    "tr_success": ">>> 协议: 现实改写 // 成功\n{details}\n{status}\n[ 确认 ] 现实已重构。",
+    "ta_success": ">>> 属性: {attr} // 成功\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 恭喜你，特工。 ]",
+    "tr_success": ">>> 协议: 现实改写 // 成功\n[ 序列 ] {rolls}\n[ 详情 ] 质保:{val} | 过载:{burn} | 混沌 +{cntChaos}\n[ 现实已重构。 ]",
     
-    // 模版G: 属性-QA阶段预览
-    "ta_qa_start": ">>> 属性: {attr} // QA批准\n[ 状态 ] 成功数: {cntTri} | 新增混沌: {cntChaos}\n{prompt}",
-    "tr_qa_start": ">>> 协议: 现实改写 // QA批准\n[ 状态 ] 成功数: {cntTri} | 新增混沌: {cntChaos}\n{prompt}",
-
-    // 通用组件
-    "roll_details": "[ 序列 ] {rolls}",
-    "status_line": "[ 详情 ] 质保:{val} | 过载:{burn} | 混沌:{chaos}",
-    
-    // 其他提示
-    "qa_prompt": "> 等待QA调整: .taqa <数值> / .taqa quit",
+    // 属性-QA阶段预览
+    "ta_qa_start": ">>> 属性: {attr} ---QA阶段\n[ 序列 ] {rolls}\n[ QA详情 ] 质保:{val} | 过载:{burn}\n>[ 状态 ] 等待QA调整\n.taqa <数值>/quit",
+    "tr_qa_start": ">>> 协议: 现实改写 ---QA阶段\n[ 序列 ] {rolls}\n[ QA详情 ] 质保:{val} | 过载:{burn}\n>[ 状态 ] 等待QA调整\n .taqa <数值>/quit",
     "qa_error_guarantee": "[ 错误 ] 资质保证不足。无法扣除 {val} (当前{attr}: {current})",
-    "qa_quit": "> QA阶段结束。执行结算...",
+    "qa_quit": "> QA阶段结束。已结算。",
+
+    // 三重升华提示
     "trine_selected": "> 已确认分支: {selection}",
     "trine_option_a_result": "[ 全员协力 ] 支援抵达 | 成功数 +{addCount} | 当前: {newTri}",
-    "trine_option_a_large": "[ 全员协力 ] 分部全力响应 | 成功数 +{addCount} | 当前: {newTri}\n[ 警报 ] 天际被巨大的红色三角遮蔽...",
-    "trine_option_a_infinite": "[ 全员协力 ] 无限增援协议生效 | 成功数 +{addCount} | 当前: {newTri}\n[ 警报 ] 现实边界正在崩塌...",
+    "trine_option_a_large": "[ 全员协力 ] 分部全力响应 | 成功数 +{addCount} | 当前: {newTri}\n[ 警告 ] 天际正被红色三角遮蔽...",
+    "trine_option_a_infinite": "[ 全员协力 ] 无限增援协议生效 | 成功数 +{addCount} | 当前: {newTri}\n[ 警告 ] 现实边界正在崩塌...",
     "trine_option_b_result": "[ 稍后重议 ] 指令确认。请手动调整资质保证 (如: .st 专注+3)。",
     "trine_option_c_result": "[ 此刻之星 ] 嘉奖已发放: {commendAmount} 点。",
     "trine_quit": "> 三重升华协议已取消。",
@@ -140,16 +146,49 @@ const rollStates: Record<string, RollState> = {};
 
 // .ta/.tr 指令的属性别名映射(用这里的别名才能触发流程化掷骰)
 const ALIAS_MAP = {
-    "专注": ATTR_FOCUS, "foc": ATTR_FOCUS,
-    "欺瞒": ATTR_DECEPTION, "dec": ATTR_DECEPTION,
-    "活力": ATTR_VIGOR, "vig": ATTR_VIGOR,
-    "共情": ATTR_EMPATHY, "emp": ATTR_EMPATHY,
-    "主动": ATTR_INITIATIVE, "ini": ATTR_INITIATIVE,
-    "坚毅": ATTR_RESOLVE, "res": ATTR_RESOLVE,
-    "气场": ATTR_PRESENCE, "pre": ATTR_PRESENCE,
-    "专业": ATTR_PROFESSIONALISM, "pro": ATTR_PROFESSIONALISM,
-    "诡秘": ATTR_SECRECY, "sec": ATTR_SECRECY,
-    "过载": ATTR_OVERLOAD, "ove": ATTR_OVERLOAD
+    "专注": ATTR_FOCUS,
+    "缜密": ATTR_FOCUS,
+    "attentiveness": ATTR_FOCUS,
+    "zz": ATTR_FOCUS,
+    "zm": ATTR_FOCUS,
+
+    "欺瞒": ATTR_DECEPTION,
+    "duplicity": ATTR_DECEPTION,
+    "qm": ATTR_DECEPTION,
+
+    "活力": ATTR_VIGOR,
+    "dynamism": ATTR_VIGOR,
+    "hl": ATTR_VIGOR,
+
+    "共情": ATTR_EMPATHY,
+    "empathy": ATTR_EMPATHY,
+    "gq": ATTR_EMPATHY,
+
+    "主动": ATTR_INITIATIVE,
+    "initiative": ATTR_INITIATIVE,
+    "zd": ATTR_INITIATIVE,
+
+    "坚毅": ATTR_RESOLVE,
+    "坚持": ATTR_RESOLVE,
+    "persistence": ATTR_RESOLVE,
+    "jy": ATTR_RESOLVE,
+    "jc": ATTR_RESOLVE,
+
+    "气场": ATTR_PRESENCE,
+    "气质": ATTR_PRESENCE,
+    "presence": ATTR_PRESENCE,
+    "qc": ATTR_PRESENCE,
+    "qz": ATTR_PRESENCE,
+
+    "专业": ATTR_PROFESSIONALISM,
+    "professionalism": ATTR_PROFESSIONALISM,
+    "zy": ATTR_PROFESSIONALISM,
+
+    "诡秘": ATTR_SECRECY,
+    "精微": ATTR_SECRECY,
+    "subtlety": ATTR_SECRECY,
+    "gm": ATTR_SECRECY,
+    "jw": ATTR_SECRECY
 };
 
 const ATTRIBUTES = [
@@ -161,9 +200,9 @@ const ATTRIBUTES = [
 const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_ADMONITION];
 
 
-    let ext = seal.ext.find('TA-triangle-agency');
+    let ext = seal.ext.find('TriangleAgency');
     if (!ext) {
-        ext = seal.ext.new('TA-triangle-agency', '小李Lxt', '0.1.1');
+        ext = seal.ext.new('TriangleAgency', '理水叠山333', '0.1.3');
         seal.ext.register(ext);
         
         // 注册风味文字配置
@@ -171,7 +210,7 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
              seal.ext.registerStringConfig(ext, `flavor_${key}`, DEFAULT_FLAVOR[key], `风味文字: ${key}`);
         }
     }
-    console.log("TA-triangle-agency plugin loading...");
+    console.log("TriangleAgency plugin loading...");
 
 
     // 注册三角机构规则模板 (用于 .set ta)
@@ -179,9 +218,9 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
         const template: any = {
             name: "TriangleAgency",
             fullName: "三角机构",
-            authors: ["小李Lxt"],
-            version: "0.1.1",
-            updatedTime: "20260111",
+            authors: ["理水叠山333"],
+            version: "0.1.3",
+            updatedTime: "20260122",
             templateVer: "1.0",
             attrSettings: {
                 top: ALL_ATTRIBUTES,
@@ -195,18 +234,18 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
                 relatedExt: ["TriangleAgency"]
             },
             alias: {
-                "专注": ["foc"],
-                "欺瞒": ["dec"],
-                "活力": ["vig"],
-                "共情": ["emp"],
-                "主动": ["ini"],
-                "坚毅": ["res"],
-                "气场": ["pre"],
-                "专业": ["pro"],
-                "诡秘": ["sec"],
-                "过载": ["ove"],
-                "嘉奖": ["com"],
-                "申诫": ["adm"]
+                "专注": ["缜密", "attentiveness", "zz", "zm"],
+                "欺瞒": ["duplicity", "qm"],
+                "活力": ["dynamism", "hl"],
+                "共情": ["empathy", "gq"],
+                "主动": ["initiative", "zd"],
+                "坚毅": ["坚持", "persistence", "jy", "jc"],
+                "气场": ["气质", "presence", "qc", "qz"],
+                "专业": ["professionalism", "zy"],
+                "诡秘": ["精微", "subtlety", "gm", "jw"],
+                "过载": ["gz"],
+                "嘉奖": ["jj"],
+                "申诫": ["sj"]
             },
             defaults: ALL_ATTRIBUTES.reduce((acc: Record<string, number>, attr) => {
                 acc[attr] = 0;
@@ -409,25 +448,18 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             resultKey = `${type}_success`;
         }
 
-        // 构建通用组件
         const rollsStr = renderRolls(rolls, cntBurn);
-        const details = formatText(getFlavor(ctx, "roll_details"), { rolls: rollsStr });
-        
         const currentAttrVal = playerAttr ? seal.vars.intGet(ctx, playerAttr)[0] : 0;
         let burnStr = cntBurn.toString();
         if (state.overloadIncreased) burnStr += "「已+1」";
-        
-        const status = formatText(getFlavor(ctx, "status_line"), {
-            val: currentAttrVal,
-            burn: burnStr,
-            chaos: cntChaos === 3 ? "X" : cntChaos
-        });
 
         // 组装最终文本
         const output = formatText(getFlavor(ctx, resultKey), {
             attr: playerAttr,
-            details: details,
-            status: status
+            rolls: rollsStr,
+            val: currentAttrVal,
+            burn: burnStr,
+            cntChaos: cntChaos === 3 ? "X" : cntChaos
         });
 
         seal.replyToSender(ctx, msg, output);
@@ -468,7 +500,7 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
         }
 
         // 投掷 6d4
-        const rolls = [];
+        const rolls: number[] = [];
         let cntTri = 0;
         for (let i = 0; i < 6; i++) {
             const r = Math.floor(Math.random() * 4) + 1;
@@ -537,15 +569,16 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             // --- 阶段 5: QA调整阶段 ---
             state.step = 'qa_wait';
             
-            // 显示 QA 提示
-            // 使用模版G: QA阶段预览
+            // 获取当前属性值用于显示质保
+            const currentAttrVal = seal.vars.intGet(ctx, playerAttr)[0];
+            
             const output = formatText(getFlavor(ctx, `${type}_qa_start`), {
                 attr: playerAttr,
                 rolls: renderRolls(rolls, cntBurn),
                 burn: cntBurn,
+                val: currentAttrVal,
                 cntTri: state.cntTri,
-                cntChaos: state.cntChaos === 3 ? "X" : state.cntChaos,
-                prompt: getFlavor(ctx, "qa_prompt")
+                cntChaos: state.cntChaos === 3 ? "X" : state.cntChaos
             });
             
             seal.replyToSender(ctx, msg, output);
@@ -725,7 +758,11 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
     // 注册 .taflavor 指令 (风味文字管理)
     const cmdTaFlavor = seal.ext.newCmdItemInfo();
     cmdTaFlavor.name = 'taflavor';
-    cmdTaFlavor.help = '风味文字管理：\n.taflavor list         // 查看所有风味文字\n.taflavor set <属性> <文字>  // 设置指定属性的风味文字 (群内有效)\n.taflavor reset <属性> // 重置为默认';
+    cmdTaFlavor.help = '风味文字管理：\n' +
+        '.taflavor list              // 查看所有风味文字\n' +
+        '.taflavor set <属性> <文字>   // 设置指定属性的风味文字 (群内有效)\n' +
+        '.taflavor reset <属性>      // 重置指定键为默认\n' +
+        '.taflavor reset all        // 重置全部为默认';
     cmdTaFlavor.solve = (ctx, msg, cmdArgs) => {
         const ret = seal.ext.newCmdExecuteResult(true);
         const op = cmdArgs.getArgN(1);
@@ -749,7 +786,7 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             }
             
             // 尝试拼接后续参数以支持带空格的文本
-            let parts = [];
+            let parts: string[] = [];
             for (let i = 3; i <= 20; i++) {
                let p = cmdArgs.getArgN(i);
                if (!p) break;
@@ -769,12 +806,22 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             
         } else if (op === "reset") {
             const key = cmdArgs.getArgN(2);
-            if (DEFAULT_FLAVOR.hasOwnProperty(key)) {
-                 const customKey = `$gTriangleAgency:Flavor:${key}`;
-                 seal.vars.strSet(ctx, customKey, ""); // 清空变量，从而回退到默认值
-                 seal.replyToSender(ctx, msg, `已重置 ${key} 的风味文字。`);
+            if (!key) {
+                seal.replyToSender(ctx, msg, "请给出有效参数。用法: .taflavor reset <键名> / .taflavor reset all");
+                return ret;
+            }
+            if (key === "all") {
+                for (const k in DEFAULT_FLAVOR) {
+                    const customKey = `$gTriangleAgency:Flavor:${k}`;
+                    seal.vars.strSet(ctx, customKey, "");
+                }
+                seal.replyToSender(ctx, msg, "已重置全部风味文字为默认值。");
+            } else if (DEFAULT_FLAVOR.hasOwnProperty(key)) {
+                const customKey = `$gTriangleAgency:Flavor:${key}`;
+                seal.vars.strSet(ctx, customKey, "");
+                seal.replyToSender(ctx, msg, `已重置 ${key} 的风味文字。`);
             } else {
-                 seal.replyToSender(ctx, msg, `未知键名：${key}`);
+                seal.replyToSender(ctx, msg, `未知键名：${key}`);
             }
         } else {
             ret.showHelp = true;
@@ -788,7 +835,7 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
     cmdTaHelp.name = 'tahelp';
     cmdTaHelp.help = '三角机构插件帮助指令:\n.tahelp - 显示插件的帮助信息';
     cmdTaHelp.solve = (ctx, msg, cmdArgs) => {
-        const helpText = '┏━━━━ TRIANGLE AGENCY OS v0.1.1 ━━━━┓\n' +
+        const helpText = '┏TRIANGLE AGENCY OS┓\n' +
             '> 正在接入机构OS...\n' +
             '> 身份验证通过。\n\n' +
             '[ 指令协议 ]\n' +
@@ -796,7 +843,7 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             '> .st <属性>    // 档案录入 (支持连续)\n' +
             '> .ta <属性>    // 资质检定\n' +
             '> .tr <属性>    // 现实改写\n' +
-            '> .ta/tr <数值> // 测试投掷 (不含流程)\n' +
+            '> .ta/tr       // 测试投掷 (不含流程)\n' +
             '> .tas          // 档案查询\n' +
             '> .tcs          // 混沌管控\n' +
             '> .taflavor     // 终端配置\n\n' +
@@ -809,7 +856,8 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
     ext.cmdMap['tahelp'] = cmdTaHelp;
 
     // 注册扩展
-    console.log(`TA-triangle-agency commands registered: ${Object.keys(ext.cmdMap).join(', ')}`);
+    console.log("TriangleAgency plugin loading...");
+    console.log(`TriangleAgency commands registered: ${Object.keys(ext.cmdMap).join(', ')}`);
 
 
 // ============================================================================
@@ -957,4 +1005,3 @@ function handleTrineOptionA(ctx: seal.MsgContext, msg: seal.Message, state: Roll
         seal.replyToSender(ctx, msg, "> 已选择【全员协力】\n> 请输入要增加的“3”的数量\n> 指令: .tatr <数量>");
     }
 }
-
