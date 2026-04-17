@@ -1,8 +1,8 @@
 # plugins-for-sealdice
 
-为 SealDice 编写的插件源码仓库。
+这是我为 SealDice 编写并持续整理的插件源码仓库。
 
-这个仓库现在只保留各插件的当前维护版本，历史版本不再以 `0.x.x.ts` 副本的方式并排存放，统一交给 Git 历史管理。
+当前仓库以 `Triangle Agency` 作为主要维护项目，同时收纳其他独立插件。与早期按版本文件堆叠的整理方式不同，现在这里更强调“当前维护版本 + 清晰文档 + Git 历史”，便于继续开发、发布和协作。
 
 ## 下载入口
 
@@ -19,6 +19,12 @@
   [wujing.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/other-plugins/wujing/wujing.ts)
 
 > 当前 `Triangle Agency` 提供独立 Release；其他插件暂时只提供源码直链下载。
+
+## 安装方式
+
+1. 下载对应插件的 `.ts` 文件。
+2. 在 SealDice 中上传并加载脚本。
+3. 如果希望使用相对稳定、带发布说明的版本，优先查看 `Triangle Agency Release`。
 
 ## 仓库结构
 
@@ -55,14 +61,24 @@
 
 ## 开发说明
 
-本项目核心逻辑与规则实现均为开发者原创编写。开发过程中可以使用 AI 工具辅助起草、补全与整理，但所有最终提交内容都应经过人工检查。
+本项目中的规则实现与主要逻辑均由我独立设计和编写。开发过程中会使用 AI 工具辅助起草、补全、整理和重构，但最终提交内容都会经过人工检查、修改与验证。
+
+对我来说，这个仓库既是实际可用的插件集合，也是持续提升插件开发、代码组织与维护方式的实践项目。
 
 ## 致谢
 
-感谢 `sealdice/sealdice-core` 项目的开发者。
+感谢 `sealdice/sealdice-core` 项目的开发者。海豹的扩展机制非常好用，也让很多个人开发者有机会把自己的想法真正做成插件。
 
-感谢 `oissevalt/sealdice-plugins` 中与 Triangle Agency 相关的实现与思路参考：
+感谢 `oissevalt/sealdice-plugins` 中与 `Triangle Agency` 相关的实现与思路参考：
 <https://github.com/oissevalt/sealdice-plugins/tree/main/src/triangle-agency>
+
+我带的第一个长团就是《三角机构》，也正因为实际跑团中的需求，才慢慢把这个插件做成现在的样子。
+
+## 贡献与交流
+
+如果这个仓库对你有帮助，欢迎点一个 Star。这对个人开发者来说是很直接的鼓励。
+
+本项目目前不接受直接的 PR 与 Push；如果你有想法、问题反馈或修复建议，欢迎通过 GitHub Discussions 或 Issue 交流。我会尽量在合适的时候整理并合入。
 
 ## 许可证
 
