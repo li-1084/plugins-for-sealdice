@@ -843,13 +843,18 @@ const ALL_ATTRIBUTES = [...ATTRIBUTES, ATTR_OVERLOAD, ATTR_COMMENDATION, ATTR_AD
             '> .st <属性>    // 档案录入 (支持连续)\n' +
             '> .ta <属性>    // 资质检定\n' +
             '> .tr <属性>    // 现实改写\n' +
-            '> .ta/tr       // 测试投掷 (不含流程)\n' +
+            '> .ta <数值>    // 测试投掷 (不含流程)\n' +
+            '> .tr <数值>    // 测试投掷 (不含流程)\n' +
             '> .tas          // 档案查询\n' +
             '> .tcs          // 混沌管控\n' +
-            '> .taflavor     // 终端配置\n\n' +
+            '> .tcst <数值>  // 直接设定混沌\n' +
+            '> .tatr a/b/c   // 升华分支\n' +
+            '> .taqa <数值>  // QA调整\n' +
+            '> .taflavor     // 终端配置\n' +
+            '> .tahelp       // 速查帮助\n\n' +
             '[ ! ] 警告: 本终端不支持代骰代理。\n' +
-            '[ i ] 流程: 检定 -> (升华) -> (QA) -> 结算';
-            '使用 .help <指令名> 查看特定指令的进阶参数。';
+            '[ i ] 流程: 检定 -> (升华) -> (QA) -> 结算\n' +
+            '[ i ] 使用 .help <指令名> 查看特定指令的进阶参数。';
         seal.replyToSender(ctx, msg, helpText);
         return seal.ext.newCmdExecuteResult(true);
     };
