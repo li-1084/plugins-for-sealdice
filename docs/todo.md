@@ -9,12 +9,14 @@
 
 - 后续如果插件继续迭代，需要同步更新对应 `README.md` 与 `HELP.md` 中的版本号、指令说明和下载信息，避免“源码已更新、帮助文档仍停留旧版本”的情况。
 - 如果 `other-plugins/` 下新增插件，继续沿用“一个当前源码文件 + 一个 `README.md` 说明页 + 一个 `HELP.md` 中文帮助文档”的结构。
-- 继续为 `Triangle Agency` 补第二批自动化测试，优先覆盖 `.tatr` 的三个分支、`taflavor`、以及角色卡与混沌查看指令。
+- 继续为 `Triangle Agency` 补第三批自动化测试，优先覆盖 `.tatr quit`、`.taflavor list` 与非法键输入，以及更多异常输入/跨群隔离的状态流回归。
 - 评估是否为 `WuJing` 建立同样的测试结构，复用 `tests/` 目录下的长期维护约定。
 - 如果测试规模继续增长，再决定是否引入共享测试辅助目录，如 `tests/shared/`，目前先避免过早抽象。
 
 ## 最近完成
 
+- 2026-04-17：为 `Triangle Agency` 增加第二批自动化测试，覆盖 `.tatr` 的 A/B/C 分支、`taflavor set/reset/reset all`、`.tas`、`.tcs`、`.tcst`，以及 QA 成功数边界被拒绝后仍可继续结算的状态流。
+- 2026-04-17：为 `Triangle Agency` 补充 `.tahelp` 回归测试，并将帮助输出缺失说明的热修独立落到 `main`。
 - 2026-04-17：在根 `README.md` 增加显眼的“待办 / 待修”入口，明确本文件是仓库内维护项的集中位置。
 - 2026-04-17：将 `Triangle Agency` 与 `WuJing` 的帮助说明统一整理为更完整的中文帮助文档。
 - 2026-04-17：修复 `Triangle Agency` 中 `.tahelp` 末尾说明未正确拼接进输出文本的问题。
