@@ -2,6 +2,11 @@
 
 `WuJing` 是收录在 `other-plugins/` 下的独立规则插件。
 
+## 下载
+
+- 直接下载源码：
+  [wujing.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/other-plugins/wujing/wujing.ts)
+
 ## 简介
 
 这是一个面向 SealDice 的武经规则插件，支持属性投掷、名帖查看、风味文字配置和代投。

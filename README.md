@@ -4,6 +4,22 @@
 
 这个仓库现在只保留各插件的当前维护版本，历史版本不再以 `0.x.x.ts` 副本的方式并排存放，统一交给 Git 历史管理。
 
+## 下载入口
+
+### Triangle Agency
+
+- 直接下载源码：
+  [triangle-agency.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/triangle-agency/triangle-agency.ts)
+- 正式发布页：
+  [Triangle Agency Release](https://github.com/li-1084/plugins-for-sealdice/releases/tag/triangle-agency-v0.1.3)
+
+### Other Plugins
+
+- WuJing 直接下载源码：
+  [wujing.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/other-plugins/wujing/wujing.ts)
+
+> 当前 `Triangle Agency` 提供独立 Release；其他插件暂时只提供源码直链下载。
+
 ## 仓库结构
 
 - `triangle-agency/`

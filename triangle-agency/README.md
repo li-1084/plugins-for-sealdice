@@ -2,6 +2,13 @@
 
 `Triangle Agency` 是本仓库当前的主插件。
 
+## 下载
+
+- 直接下载源码：
+  [triangle-agency.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/triangle-agency/triangle-agency.ts)
+- GitHub Release：
+  [Triangle Agency v0.1.3](https://github.com/li-1084/plugins-for-sealdice/releases/tag/triangle-agency-v0.1.3)
+
 ## 简介
 
 这是一个面向 SealDice 的《三角机构》规则插件，核心体验围绕流程化检定展开：

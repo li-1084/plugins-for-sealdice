@@ -11,6 +11,8 @@
 
 - `wujing/`
   - 武经规则插件
+  - 直接下载：
+    [wujing.ts](https://raw.githubusercontent.com/li-1084/plugins-for-sealdice/main/other-plugins/wujing/wujing.ts)
 
 后续如果新增插件，建议继续沿用同样的结构：
 
