@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "files": [
+    "./wujing.ts",
+    "../../shared/seal.d.ts"
+  ]
+}

@@ -5,7 +5,8 @@
 每个插件应当各自拥有：
 
 - 一个当前源码文件
-- 一个面向维护者和使用者的 `README.md`
+- 一个简短的 `README.md` 说明页
+- 一个完整的 `HELP.md` 中文帮助文档
 
 当前包含：
 
@@ -18,3 +19,4 @@
 
 - `other-plugins/<plugin-name>/<plugin-name>.ts`
 - `other-plugins/<plugin-name>/README.md`
+- `other-plugins/<plugin-name>/HELP.md`

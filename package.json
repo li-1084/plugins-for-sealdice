@@ -1,0 +1,16 @@
+{
+  "name": "plugins-for-sealdice",
+  "private": true,
+  "scripts": {
+    "typecheck": "npm run typecheck:triangle-agency && npm run typecheck:wujing && npm run typecheck:test:triangle-agency",
+    "typecheck:triangle-agency": "tsc -p triangle-agency/tsconfig.json",
+    "typecheck:wujing": "tsc -p other-plugins/wujing/tsconfig.json",
+    "typecheck:test:triangle-agency": "tsc -p tests/triangle-agency/tsconfig.json",
+    "test": "npm run test:triangle-agency",
+    "test:triangle-agency": "node --experimental-strip-types --test --test-concurrency=1 tests/triangle-agency/triangle-agency.test.mts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -4,6 +4,16 @@
 
 当前仓库以 `Triangle Agency` 作为主要维护项目，同时收纳其他独立插件。与早期按版本文件堆叠的整理方式不同，现在这里更强调“当前维护版本 + 清晰文档 + Git 历史”，便于继续开发、发布和协作。
 
+## 待办 / 待修
+
+仓库内当前明确的维护项、待办和待修记录，统一收敛在 [docs/todo.md](docs/todo.md)。
+
+如果你是第一次进入这个仓库，除了下载入口之外，最值得先看的就是这两类位置：
+
+- 待办 / 待修：`docs/todo.md`
+- 各插件说明页：对应插件目录下的 `README.md`
+- 各插件帮助页：对应插件目录下的 `HELP.md`
+
 ## 下载入口
 
 ### Triangle Agency
@@ -35,7 +45,7 @@
 - `shared/`
   - 共用类型定义，目前保存一份 `seal.d.ts`。
 - `docs/`
-  - 仓库维护说明与迁移记录。
+  - 仓库维护说明、迁移记录与待办文档。
 
 ## 当前插件
 
@@ -44,13 +54,16 @@
 三角机构规则插件，支持属性检定、现实改写、三重升华、QA 调整、混沌管理与风味文字配置。
 
 - 源码：`triangle-agency/triangle-agency.ts`
-- 说明：`triangle-agency/README.md`
+- 说明页：`triangle-agency/README.md`
+- 帮助页：`triangle-agency/HELP.md`
 
 ### Other Plugins
 
-其他插件统一放在 `other-plugins/` 下，单个插件各自维护自己的 README 与源码。
+其他插件统一放在 `other-plugins/` 下，单个插件各自维护自己的源码、说明页 README 与帮助页 HELP。
 
 - 武经：`other-plugins/wujing/`
+- 说明页：`other-plugins/wujing/README.md`
+- 帮助页：`other-plugins/wujing/HELP.md`
 
 ## 维护原则
 
@@ -93,6 +106,8 @@
 如果这个仓库对你有帮助，欢迎点一个 Star。这对个人开发者来说是很直接的鼓励。
 
 本项目目前不接受直接的 PR 与 Push；如果你有想法、问题反馈或修复建议，欢迎通过 GitHub Discussions 或 Issue 交流。我会尽量在合适的时候整理并合入。
+
+对于仓库作者自己明确要跟进的维护项，则统一记录在 `docs/todo.md`，避免分散在提交说明、聊天记录或零散备注里。
 
 ## 许可证
 
